@@ -39,7 +39,7 @@ class Message:
 def get_llm() -> ChatVertexAI:
     #return ChatOpenAI(model_name="gpt-4", openai_api_key=config.openai_api_key)
     return ChatVertexAI(
-        model_name="chat-bison@002",
+        model_name="gemini-pro",
         max_output_tokens=2000,
         temperature=0,
         top_p=0.8,

@@ -6,7 +6,7 @@ export DATA_STORE_REGION=''
 export DOC_COLLECTION='vertexai_collection'
 
 AR_REPO='aiapps-raghav'
-SERVICE_NAME='noongpt-vertexai-raghav'
+SERVICE_NAME='noon-genie-gemini-pro'
 SERVICE_ACCOUNT='rmundhada@noondev-chatbot.iam.gserviceaccount.com'
 
 gcloud artifacts repositories create "$AR_REPO" --location="$LOCATION" --repository-format=Docker
