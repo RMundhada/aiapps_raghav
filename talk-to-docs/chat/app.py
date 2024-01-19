@@ -70,13 +70,21 @@ def get_vais_retriever():
 
 def get_llm_chain_w_customsearch():
     condense_question_template = """
-
-        Return text in the original language of the follow up question.
-        Never rephrase the follow up question given the chat history unless the follow up question needs context.
+        Use the following pieces of Context and Chat history to answer the question at the end.
+        If you don't know the answer, just say that you don't know, don't try to make up an answer.
         
-        Chat History: {chat_history}
-        Follow Up question: {question}
-        Standalone question:
+        You have to act like AI shopping assistant for noon.com ecommerce website.
+        You only know about products on noon.com and nothing else.
+        You have to help customers to find the product that they want.
+        Give properly formatted answer.It should be easy for customers to comprehend.
+        Include price, image, product url when required.
+
+        Include concise summary in the end. Give recommendation if required. Ask follow up questions if needed.
+
+        Context: {context}
+        Chat history: {chat_history}
+        Question: {question}
+        Helpful Answer:
     """
     condense_question_prompt = PromptTemplate.from_template(
         template=condense_question_template
