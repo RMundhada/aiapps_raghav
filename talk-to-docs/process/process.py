@@ -102,10 +102,9 @@ def process():
     batch_docs = docs[batch_start_idx: batch_start_idx + batch_size]
 
     for idx, doc in enumerate(batch_docs):
-        if doc.metadata.get('offer_code') == 'e8ce9faac9beb02e':
-            print(f"PAGE CONTENT {doc.page_content}")
-            print(f"=====Processing doc {idx + 1}/{len(batch_docs)} - Task: {TASK_INDEX}")
-            #processor.process_doc_lc(doc, doc_process_callback)
+        print(f"PAGE CONTENT {doc.page_content}")
+        print(f"=====Processing doc {idx + 1}/{len(batch_docs)} - Task: {TASK_INDEX}")
+        processor.process_doc_lc(doc, doc_process_callback)
 
     time_taken = round(time.time() - method_start, 3)
 
