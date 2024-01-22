@@ -81,7 +81,6 @@ def preprocess_docs(docs):
         highlights = f"highlights for {title} are {product_detail.get('highlights')}"
         description = f"description for {title} are {product_detail.get('description')}"
         new_page_content = f"{noon_details} . {specs} . {description} . {highlights}"
-        print(new_page_content)
         doc.page_content = new_page_content
 
 
@@ -91,45 +90,20 @@ def process():
         f"with following settings {settings.model_dump()}")
 
     method_start = time.time()
+    processor = doc_process.Client(settings=settings)
+    docs = processor.dl.load_gcs_file_to_lc(bucket_name=processor.docs_bucket,
+                                            blob_name='noon-catalog-data/Chatbot_data_filtered.json')
+    preprocess_docs(docs)
+    print(f"******* {len(docs)} documents to be processed...")
 
-    if settings.file_type in [consts.FileType.HTML.value, consts.FileType.PDF.value]:
+    batch_size = math.ceil(len(docs) / TASK_COUNT)
+    batch_start_idx = batch_size * TASK_INDEX
+    batch_docs = docs[batch_start_idx: batch_start_idx + batch_size]
 
-        processor = doc_process.Client(settings=settings)
-
-        docs = processor.dl.load_gcs_docs_to_lc(bucket_name=processor.docs_bucket, file_type=processor.file_type)
-
-        print(f"******* {len(docs)} documents to be processed...")
-        counter = multiprocessing.Value('i', 0)
-        with multiprocessing.Pool() as pool:
-            pool.starmap(processor.process_doc_lc, [(doc, counter) for doc in docs])
-        print(f"Doc {counter.value}/{len(docs)} processed")
-
-    elif settings.file_type == consts.FileType.JSON.value:
-        processor = doc_process.Client(settings=settings)
-        docs = processor.dl.load_gcs_file_to_lc(bucket_name=processor.docs_bucket,
-                                                blob_name='noon-catalog-data/Chatbot_data_filtered.json')
-        preprocess_docs(docs)
-        print(f"******* {len(docs)} documents to be processed...")
-        # batches = []
-        # i = 0
-        # batch_size = 1000
-        # while i < len(docs):
-        #     batches.append([i, i+batch_size])
-        #     i += batch_size
-        # print(batches)
-        # with multiprocessing.Pool() as pool:
-        #     pool.starmap(multiprocessdocs, [(docs[b[0]: b[1]], doc_process_callback) for b in batches])
-
-        batch_size = math.ceil(len(docs) / TASK_COUNT)
-        batch_start_idx = batch_size * TASK_INDEX
-        batch_docs = docs[batch_start_idx: batch_start_idx + batch_size]
-
-        for idx, doc in enumerate(batch_docs):
-            print(f"PAGE CONTENT {doc.page_content}")
-            print(f"=====Processing doc {idx + 1}/{len(batch_docs)} - Task: {TASK_INDEX}")
-            processor.process_doc_lc(doc, doc_process_callback)
-    else:
-        raise ValueError(f"File type {settings.file_type} not supported")
+    for idx, doc in enumerate(batch_docs):
+        print(f"PAGE CONTENT {doc.page_content}")
+        print(f"=====Processing doc {idx + 1}/{len(batch_docs)} - Task: {TASK_INDEX}")
+        processor.process_doc_lc(doc, doc_process_callback)
 
     time_taken = round(time.time() - method_start, 3)
 
