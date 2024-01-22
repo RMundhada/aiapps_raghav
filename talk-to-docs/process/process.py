@@ -74,7 +74,8 @@ def preprocess_docs(docs):
     for doc in docs:
         product_detail = json.loads(doc.page_content)
         if not product_detail.get('title_en'):
-            return
+            print(f"NO TITLE: {product_detail}")
+            continue
         title = product_detail['title_en']
         noon_details = ". ".join([process_process_pd_key(y) + ' ' + str(process_process_pd_value(y, product_detail[y])) for y in product_detail if y not in ('description', 'highlights', 'specifications', 'sku_config', 'offer_code')])
         specs = f"specifications for {title} are {process_specs(product_detail.get('specifications'))}"
@@ -101,9 +102,10 @@ def process():
     batch_docs = docs[batch_start_idx: batch_start_idx + batch_size]
 
     for idx, doc in enumerate(batch_docs):
-        print(f"PAGE CONTENT {doc.page_content}")
-        print(f"=====Processing doc {idx + 1}/{len(batch_docs)} - Task: {TASK_INDEX}")
-        processor.process_doc_lc(doc, doc_process_callback)
+        if doc.metadata.get('offer_code') == 'e8ce9faac9beb02e':
+            print(f"PAGE CONTENT {doc.page_content}")
+            print(f"=====Processing doc {idx + 1}/{len(batch_docs)} - Task: {TASK_INDEX}")
+            #processor.process_doc_lc(doc, doc_process_callback)
 
     time_taken = round(time.time() - method_start, 3)
 
