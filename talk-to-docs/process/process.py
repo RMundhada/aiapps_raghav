@@ -128,8 +128,6 @@ def process():
             print(f"PAGE CONTENT {doc.page_content}")
             print(f"=====Processing doc {idx + 1}/{len(batch_docs)} - Task: {TASK_INDEX}")
             processor.process_doc_lc(doc, doc_process_callback)
-            break
-
     else:
         raise ValueError(f"File type {settings.file_type} not supported")
 
